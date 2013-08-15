@@ -1,12 +1,11 @@
 server {
-  listen                <%= @listen_address %>:<%= @listen_port %>;
-  
-  server_name           <%= @server_name %> <%= @server_aliases.join(" ") %>;
-  access_log            /var/log/nginx/<%= @server_name %>.access.log;
+  listen <%= @listen_port %>;
+  server_name <%= @server_name %> <%= @server_aliases.join(" ") %>;
+  access_log /var/log/nginx/<%= @server_name %>.access.log;
 
   location / {
     root  <%= @kibana_dir %>/current;
-    index  index.html  index.htm; 
+    index  index.html  index.htm;
   }
 
   location ~ ^/_aliases$ {
@@ -17,7 +16,7 @@ server {
     proxy_pass http://<%= @es_server %>:<%= @es_port %>;
     proxy_read_timeout 90;
   }
-  
+
   # Password protected end points
   location ~ ^/kibana-int/dashboard/.*$ {
     proxy_pass http://<%= @es_server %>:<%= @es_port %>;

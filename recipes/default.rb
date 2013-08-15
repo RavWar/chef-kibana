@@ -17,25 +17,32 @@
 # limitations under the License.
 #
 
-include_recipe "git"
+include_recipe 'apt'
+include_recipe 'git'
+include_recipe 'user'
 
-if node['kibana']['user'].empty?
-  webserver = node['kibana']['webserver']
-  kibana_user = "#{node[webserver]['user']}"
-else
-  kibana_user = node['kibana']['user']
+user_account node['kibana']['user'] do
+  system_user true
+  gid 'sudo'
 end
 
+group node['kibana']['group'] do
+  members node['kibana']['user']
+  append true
+end
+
+include_recipe "kibana::#{node['kibana']['webserver']}"
+
 directory node['kibana']['installdir'] do
-  owner kibana_user
-  mode "0755"
+  owner node['kibana']['user']
+  mode 0755
 end
 
 git "#{node['kibana']['installdir']}/#{node['kibana']['branch']}" do
   repository node['kibana']['repo']
   reference node['kibana']['branch']
   action :sync
-  user kibana_user
+  user node['kibana']['user']
 end
 
 link "#{node['kibana']['installdir']}/current" do
@@ -45,8 +52,6 @@ end
 template "#{node['kibana']['installdir']}/current/config.js" do
   source node['kibana']['config_template']
   cookbook node['kibana']['config_cookbook']
-  mode "0750"
-  user kibana_user
+  mode 0644
+  user node['kibana']['user']
 end
-
-include_recipe "kibana::#{node['kibana']['webserver']}"
