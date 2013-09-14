@@ -46,7 +46,7 @@ git "#{node['kibana']['installdir']}/#{node['kibana']['branch']}" do
 end
 
 link "#{node['kibana']['installdir']}/current" do
-  to "#{node['kibana']['installdir']}/#{node['kibana']['branch']}"
+  to "#{node['kibana']['installdir']}/#{node['kibana']['branch']}/dist"
 end
 
 template "#{node['kibana']['installdir']}/current/config.js" do
